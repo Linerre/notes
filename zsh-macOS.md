@@ -186,4 +186,72 @@ was so angry that he thought `path_helper` is **"broken"**:
 >
 >Setting PATH on Mac OS X is a mess, and `path_helper` doesn't help.
 
+**Indeed, I recommend reading the whole thread/discussion, as it provides a great deal of useful information.** I'll quote one more here to explain why I don't recommend to modify `/etc/paths` stuff or diable `/usr/libexec/path_helper`. 
+
+[@mislav](https://github.com/mislav)'s this comment [argues](https://github.com/sorin-ionescu/prezto/issues/381#issuecomment-12792587) that:
+1. `path_helper` does what it is supposed to: generate `$PATH` for macOS
+2. forget having disabled it might cause further trouble in the future.
+
+## Solutions
+Yes, there are more than one fixes. But before that, let me ask one more question: why rarely did I find many people complaining about `path_helper` breaking their Homebrew on macOS?
+
+### The  `.*shrc` file
+The answer is simple: many, really many, macOS CLI tools ask users to modify their `.bashrc` or `.zshrc`, rather than `.bash_profile` or `.zshenv`. This is the very key to the solutions to my issue. Read on.
+
+### Order is key and everything!
+The order in which a shell's startup files get sourced/read **matters** most! You'd better believe this.
+
+[@mislav](https://github.com/mislav) also has this detailed [write-up](https://github.com/sstephenson/rbenv/wiki/Unix-shell-initialization). 
+
+### Bash
+On macOS, for [bash](https://github.com/rbenv/rbenv/wiki/Unix-shell-initialization#bash), these files are source in the following order:
+
+1. **login** mode:
+    1. `/etc/profile` (calling `path_helper`)
+    2. `~/.bash_profile`,` ~/.bash_login`, `~/.profile` (only first one that exists)
+2. interactive **non-login**:
+    1. `/etc/bash.bashrc` (some Linux; not on Mac OS X)
+    2. `~/.bashrc`
+3. **non-interactive**:
+    1. source file in `$BASH_ENV`
+
+Since macOS always open a login shell when you start a new terminal window, the `/etc/profile` always gets sourced. This file is very simple:
+
+```
+# System-wide .profile for sh(1)
+
+if [ -x /usr/libexec/path_helper ]; then
+	eval `/usr/libexec/path_helper -s`
+fi
+
+if [ "${BASH-no}" != "no" ]; then
+	[ -r /etc/bashrc ] && . /etc/bashrc
+fi
+```
+
+After this file, `$PATH` is set using the contents from `/etc/paths` and `files under `/etc/paths.d`. 
+
+Then if a user modifies their `$PATH` in any of `~/.bash_profile`, `~/.bashrc`, or `~/.profile`. `$PATH` acts as expected. A user may append or prepend to it some other paths:
+```shell
+# prepend a path
+export PATH=/some/path:$PATH
+
+# append a path
+export PATH=$PATH:/some/path
+```
+
+### Zsh
+For [zsh](https://github.com/rbenv/rbenv/wiki/Unix-shell-initialization#zsh), the order is like this:
+1. /etc/zshenv
+2. ~/.zshenv
+3. **login** mode:
+    1. /etc/zprofile
+    2.  ~/.zprofile
+4. **interactive**:
+        /etc/zshrc
+        ~/.zshrc
+5. **login** mode:
+        /etc/zlogin
+        ~/.zlogin
+
 
