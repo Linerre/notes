@@ -192,8 +192,8 @@ was so angry that he thought `path_helper` is **"broken"**:
 1. `path_helper` does what it is supposed to: generate `$PATH` for macOS
 2. forget having disabled it might cause further trouble in the future.
 
-## Solutions
-Yes, there are more than one fixes. But before that, let me ask one more question: why rarely did I find many people complaining about `path_helper` breaking their Homebrew on macOS?
+## Situation explained
+Let me ask one more question: why rarely did I find many people complaining about `path_helper` breaking their Homebrew on macOS?
 
 ### The  `.*shrc` file
 The answer is simple: many, really many, macOS CLI tools ask users to modify their `.bashrc` or `.zshrc`, rather than `.bash_profile` or `.zshenv`. This is the very key to the solutions to my issue. Read on.
@@ -242,16 +242,41 @@ export PATH=$PATH:/some/path
 
 ### Zsh
 For [zsh](https://github.com/rbenv/rbenv/wiki/Unix-shell-initialization#zsh), the order is like this:
-1. /etc/zshenv
-2. ~/.zshenv
+1. `/etc/zshenv` (no longer exists on macOS by default)
+2. `~/.zshenv`
 3. **login** mode:
-    1. /etc/zprofile
-    2.  ~/.zprofile
+    1. `/etc/zprofile` (calling `path_helper`)
+    2. `~/.zprofile`
 4. **interactive**:
-        /etc/zshrc
-        ~/.zshrc
+        `/etc/zshrc`
+        `~/.zshrc`
 5. **login** mode:
-        /etc/zlogin
-        ~/.zlogin
+       `/etc/zlogin`
+        `~/.zlogin`
 
+If you, like me, set `$PATH` in `~/.zshenv`, it gets sourced first and `$PATH` then becomes something like:
 
+```
+# user may append and prepend their paths to the default system one
+/some/path:/usr/local/bin:/usr/bin:/bin/....:/some/other/path
+```
+
+Then, on macOS, since it is always login shell in a new terminal window, `/etc/zprofile` gets sourced and calls `path_helper`. At this time, `path_helper` sees your `$PATH` already contains the default from `/etc/paths` and `/etc/paths.d`, it will **NOT** add anything new to it.
+
+However, it will **RE_ORDER** the `$PATH` to make it like:
+```
+/usr/local/bin:/usr/bin:....:/user/appended/or/prepended/paths
+```
+
+As I have shown in the beginning ...
+
+### Solutions
+The key lies in the idea that we should start appending or prepending the `$PATH` after `path_helper` has been called. Using bash, that would be somewhere in `~/.bashrc` or `~/.bash_profile`.
+
+Using zsh, on macOS, avoid `~/.zshenv` and choose `~/.zshrc` or `~/.zprofile`instead.
+
+What if I insist on sticking to *Zsh User Guide*? See this message from Zsh mailing list: [Re: ~/.zshenv or ~/.zprofile](https://www.zsh.org/mla/users/2003/msg00600.html)
+
+The following two articles might be as helpful:
+1. [Moving to zsh, part 2: Configuration Files](https://scriptingosx.com/2019/06/moving-to-zsh-part-2-configuration-files)
+2. [Setting the PATH in Scripts](https://scriptingosx.com/2018/02/setting-the-path-in-scripts)
