@@ -271,7 +271,9 @@ However, it will **RE-ORDER** the `$PATH` to make it like:
 As I have shown in the beginning ...
 
 ### Solutions
-The key lies in the idea that we should start appending or prepending the `$PATH` after `path_helper` has been called. Using bash, that would be somewhere in `~/.bashrc` or `~/.bash_profile`.
+The key lies in the idea that we should start appending or prepending the `$PATH` after `path_helper` has been called. 
+
+Using bash, that would be somewhere in `~/.bashrc` or `~/.bash_profile`.
 
 Using zsh, on macOS, avoid `~/.zshenv` and choose `~/.zshrc` or `~/.zprofile`instead.
 
