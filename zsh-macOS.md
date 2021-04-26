@@ -263,7 +263,7 @@ If you, like me, set `$PATH` in `~/.zshenv`, it gets sourced first and `$PATH` t
 
 Then, on macOS, since it is always login shell in a new terminal window, `/etc/zprofile` gets sourced and calls `path_helper`. At this time, `path_helper` sees your `$PATH` already contains the default from `/etc/paths` and `/etc/paths.d`, it will **NOT** add anything new to it.
 
-However, it will **RE_ORDER** the `$PATH` to make it like:
+However, it will **RE-ORDER** the `$PATH` to make it like:
 ```
 /usr/local/bin:/usr/bin:....:/user/appended/or/prepended/paths
 ```
