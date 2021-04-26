@@ -1,4 +1,5 @@
-# macOS, Zsh, and more This gist is based on a twitter
+# macOS, Zsh, and more 
+This gist is based on a twitter
 [thread](https://twitter.com/giftboiling/status/1386359878797565955?s=20) I
 just want to add a few more details on this topic.
 
@@ -6,7 +7,7 @@ just want to add a few more details on this topic.
 I'm not going to repeat what has alreay  been well documented:
 When zsh starts up, it looks for a few [startup
 files](http://zsh.sourceforge.net/Guide/zshguide02.html#l). Among them,
-`~/.zshenv` and `~/.zshrc` are the most relevant to a normal user like me. 
+`~/.zshenv` and `~/.zshrc` are the most relevant to a normal user like me. They are also the focus of this gist.
 
 Both the [Zsh User Guide](http://zsh.sourceforge.net/Guide/zshguide02.html#l23)
 and [Arch Wiki](https://wiki.archlinux.org/index.php/Zsh#Configuring_$PATH)
@@ -46,7 +47,7 @@ case $KERNEL_NAME in
     *) ;;
 esac
 ```
-As you can see, I prefer to use my own Python and Nodejs under my $HOME while
+As you can see, I prefer to use my own Python and Nodejs under my `$HOME` while
 leaving the system ones alone. Kind of clean in my eyes. And it'd worked
 pretty well on all my Linux/\*BSD machines. 
 
@@ -132,12 +133,11 @@ This has been mentioned in a few places on the Internet too:
 
 ### What does it do?
 From the man page and info above, it is pretty clear what this tool does:
-1. it looks for the file `/etc/paths` and files under `/etc/paths.d/`;
+1. it looks for the file `/etc/paths` and files under `/etc/paths.d/`
 2. it combined all the paths in these files
-3. it returns the combined paths (as a string) and assigns it to $PATH
-It is easy to confirm this. Simply run:
+3. it returns the combined paths (as a string) and assigns it to `$PATH`
 
-    $ /usr/libexec/path_helper
+It is easy to confirm this. Simply run: `$ /usr/libexec/path_helper`
 
 And it return something like:
 
